@@ -1,5 +1,8 @@
 namespace Identity.Migrations
 {
+    using Identity.Models;
+    using Microsoft.AspNet.Identity;
+    using Microsoft.AspNet.Identity.EntityFramework;
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Migrations;
@@ -10,7 +13,6 @@ namespace Identity.Migrations
         public Configuration()
         {
             AutomaticMigrationsEnabled = true;
-            ContextKey = "Identity.Models.ApplicationDbContext";
         }
 
         protected override void Seed(Identity.Models.ApplicationDbContext context)
@@ -19,8 +21,15 @@ namespace Identity.Migrations
 
             //  You can use the DbSet<T>.AddOrUpdate() helper extension method 
             //  to avoid creating duplicate seed data.
-            context.Users.AddOrUpdate(u => u.UserName,
-                    new Models.ApplicationUser { UserName = ""})
+
+            if (!context.Users.Any(u => u.UserName == "sallen"))
+            {
+                var store = new UserStore<ApplicationUser>(context);
+                var manager = new UserManager<ApplicationUser>(store);
+                var user = new ApplicationUser { UserName = "sallen", Email = "sallen@wutang.com" };
+
+                manager.Create(user, "password");
+            }
         }
     }
 }
